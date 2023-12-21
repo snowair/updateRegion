@@ -74,18 +74,13 @@ func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceIn
 		cInfo.Display = strings.TrimSuffix(cName, "市")
 		cInfo.Code = cCode
 
-		if !bigCityMap[cName] {
-			pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
+		areas, err := getRegionInfo(province, cName)
+		if err != nil {
 			continue
-		} else {
-			areas, err := getRegionInfo(province, cName)
-			if err != nil {
-				continue
-			}
-
-			getAreas(areas, &cInfo)
-			pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
 		}
+
+		getAreas(areas, &cInfo)
+		pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
 	}
 }
 
