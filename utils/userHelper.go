@@ -54,7 +54,7 @@ func writeJsonFile(pInfos []ProvinceInfo) {
 
 	//写json
 	buff, _ := json.Marshal(pInfos)
-	fPath := fmt.Sprintf("%s\\json_%s.json", GetExeDir(), time.Now().Format("20060102150405"))
+	fPath := fmt.Sprintf("%s%sjson_%s.json", GetExeDir(), string(os.PathSeparator), time.Now().Format("20060102150405"))
 	os.WriteFile(fPath, buff, os.ModePerm)
 
 }
@@ -63,7 +63,7 @@ func writeJsonFile(pInfos []ProvinceInfo) {
 func writeCsvFile(pInfos []ProvinceInfo) {
 
 	// Create a new CSV file
-	fPath := fmt.Sprintf("%s\\csv_%s.csv", GetExeDir(), time.Now().Format("20060102150405"))
+	fPath := fmt.Sprintf("%s%scsv_%s.csv", GetExeDir(), string(os.PathSeparator), time.Now().Format("20060102150405"))
 	file, err := os.Create(fPath)
 	if err != nil {
 		log.Fatal(err)
