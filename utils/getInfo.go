@@ -23,7 +23,16 @@ func DoGetInfo() {
 
 		p := provinceInfo[0][:strings.IndexRune(provinceInfo[0], rune('（'))]
 
+		simple := strings.TrimSuffix(p, "省")
+		simple = strings.TrimSuffix(simple, "市")
+		simple = strings.TrimSuffix(simple, "自治区")
+		simple = strings.TrimSuffix(simple, "特别行政区")
+		simple = strings.TrimSuffix(simple, "维吾尔")
+		simple = strings.TrimSuffix(simple, "回族")
+		simple = strings.TrimSuffix(simple, "壮族")
+
 		pInfo.Name = p
+		pInfo.Display = simple
 		pInfo.Code = provinceInfo[1]
 
 		fmt.Printf("进度: %d/%d 正在查询省份%s...\r\n", (index + 1), len(provinces), province)
@@ -44,6 +53,15 @@ func DoGetInfo() {
 	log.Println("查询完成，已输出json、csv文件到：", GetExeDir())
 }
 
+var bigCityMap = map[string]bool{
+	"北京市": true,
+	"天津市": true,
+	"上海市": true,
+	"重庆市": true,
+	"广州市": true,
+	"深圳市": true,
+}
+
 // 获取某个省份下所有城市
 func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceInfo) {
 	for _, city := range citys {
@@ -53,15 +71,21 @@ func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceIn
 
 		var cInfo = CityInfo{}
 		cInfo.Name = cName
+		cInfo.Display = strings.TrimSuffix(cName, "市")
 		cInfo.Code = cCode
 
-		areas, err := getRegionInfo(province, cName)
-		if err != nil {
+		if !bigCityMap[cName] {
+			pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
 			continue
-		}
-		getAreas(areas, &cInfo)
-		pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
+		} else {
+			areas, err := getRegionInfo(province, cName)
+			if err != nil {
+				continue
+			}
 
+			getAreas(areas, &cInfo)
+			pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
+		}
 	}
 }
 
@@ -73,6 +97,7 @@ func getAreas(areas []map[string]interface{}, cInfo *CityInfo) {
 
 		var aInfo = AreaInfo{}
 		aInfo.Name = aName
+		aInfo.Display = aName
 		aInfo.Code = aCode
 		cInfo.AreaInfo = append(cInfo.AreaInfo, aInfo)
 
