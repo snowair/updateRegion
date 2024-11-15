@@ -31,7 +31,7 @@ type CityList struct {
 }
 
 type CitySelect struct {
-	Hot  []CityInfo    `json:"hot"`
+	Hot  []CityInfo    `json:"hot,omitempty"`
 	List []CitySection `json:"list"`
 }
 

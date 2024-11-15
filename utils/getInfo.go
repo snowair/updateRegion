@@ -23,36 +23,36 @@ func DoGetInfo() {
 	var cInfos = []*CityInfo{}
 	provinces := []string{
 		"北京市（京）:110000",
-		//"天津市（津）:120000",
+		"天津市（津）:120000",
 		"河北省（冀）:130000",
-		//"山西省（晋）:140000",
-		//"内蒙古自治区（内蒙古）:150000",
-		//"辽宁省（辽）:210000",
-		//"吉林省（吉）:220000",
-		//"黑龙江省（黑）:230000",
-		//"上海市（沪）:310000",
-		//"江苏省（苏）:320000",
-		//"浙江省（浙）:330000",
-		//"安徽省（皖）:340000",
-		//"福建省（闽）:350000",
-		//"江西省（赣）:360000",
-		//"山东省（鲁）:370000",
-		//"河南省（豫）:410000",
-		//"湖北省（鄂）:420000",
-		//"湖南省（湘）:430000",
-		//"广东省（粤）:440000",
-		//"广西壮族自治区（桂）:450000",
-		//"海南省（琼）:460000",
-		//"重庆市（渝）:500000",
-		//"四川省（川、蜀）:510000",
-		//"贵州省（黔、贵）:520000",
-		//"云南省（滇、云）:530000",
-		//"西藏自治区（藏）:540000",
-		//"陕西省（陕、秦）:610000",
-		//"甘肃省（甘、陇）:620000",
-		//"青海省（青）:630000",
-		//"宁夏回族自治区（宁）:640000",
-		//"新疆维吾尔自治区（新）:650000",
+		"山西省（晋）:140000",
+		"内蒙古自治区（内蒙古）:150000",
+		"辽宁省（辽）:210000",
+		"吉林省（吉）:220000",
+		"黑龙江省（黑）:230000",
+		"上海市（沪）:310000",
+		"江苏省（苏）:320000",
+		"浙江省（浙）:330000",
+		"安徽省（皖）:340000",
+		"福建省（闽）:350000",
+		"江西省（赣）:360000",
+		"山东省（鲁）:370000",
+		"河南省（豫）:410000",
+		"湖北省（鄂）:420000",
+		"湖南省（湘）:430000",
+		"广东省（粤）:440000",
+		"广西壮族自治区（桂）:450000",
+		"海南省（琼）:460000",
+		"重庆市（渝）:500000",
+		"四川省（川、蜀）:510000",
+		"贵州省（黔、贵）:520000",
+		"云南省（滇、云）:530000",
+		"西藏自治区（藏）:540000",
+		"陕西省（陕、秦）:610000",
+		"甘肃省（甘、陇）:620000",
+		"青海省（青）:630000",
+		"宁夏回族自治区（宁）:640000",
+		"新疆维吾尔自治区（新）:650000",
 		"香港特别行政区（港）:810000",
 		"澳门特别行政区（澳）:820000",
 		"台湾省（台）:710000",
@@ -79,7 +79,7 @@ func DoGetInfo() {
 		pInfo.Display = simple
 		pInfo.Code = provinceInfo[1]
 
-		spinyin := pinyin.Pinyin(pInfo.Name, py)
+		spinyin := pinyin.Pinyin(pInfo.Display, py)
 		for _, v := range spinyin {
 			pInfo.Pinyin += strings.Join(v, "")
 		}
@@ -123,7 +123,7 @@ func DoGetInfo() {
 	log.Println("查询完成，已输出json、csv文件到：", GetExeDir())
 }
 
-func makeCityList(citys []*CityInfo) [][]*CityInfo {
+func makeCityList(citys []*CityInfo) CitySelect {
 	capitals := map[string][]*CityInfo{}
 	capitalsList := [][]*CityInfo{}
 	for _, v := range citys {
@@ -151,9 +151,24 @@ func makeCityList(citys []*CityInfo) [][]*CityInfo {
 		return false
 	})
 
-	// TODO:
+	tmp:=CitySelect{
+		Hot:  []CityInfo{},
+		List: []CitySection{},
+	}
 
-	return capitalsList
+	for _,c:=range capitalsList {
+		section:=CitySection{}
+		for _,v:=range c {
+			section.Capital = v.Capital
+			section.List = append(section.List,*v)
+			if bigCityMap[v.Name] {
+				tmp.Hot = append(tmp.Hot,*v)
+			}
+			tmp.List = append(tmp.List,section)
+		}
+	}
+
+	return tmp 
 }
 
 var bigCityMap = map[string]bool{
@@ -182,7 +197,7 @@ func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceIn
 		cInfo.Display = strings.TrimSuffix(cName, "市")
 		cInfo.Code = cCode
 
-		spinyin := pinyin.Pinyin(cName, py)
+		spinyin := pinyin.Pinyin(cInfo.Display, py)
 		for _, v := range spinyin {
 			cInfo.Pinyin += strings.Join(v, "")
 		}
