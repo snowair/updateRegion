@@ -151,24 +151,24 @@ func makeCityList(citys []*CityInfo) CitySelect {
 		return false
 	})
 
-	tmp:=CitySelect{
+	tmp := CitySelect{
 		Hot:  []CityInfo{},
 		List: []CitySection{},
 	}
 
-	for _,c:=range capitalsList {
-		section:=CitySection{}
-		for _,v:=range c {
+	for _, c := range capitalsList {
+		section := CitySection{}
+		for _, v := range c {
 			section.Capital = v.Capital
-			section.List = append(section.List,*v)
+			section.List = append(section.List, *v)
 			if bigCityMap[v.Name] {
-				tmp.Hot = append(tmp.Hot,*v)
+				tmp.Hot = append(tmp.Hot, *v)
 			}
-			tmp.List = append(tmp.List,section)
+			tmp.List = append(tmp.List, section)
 		}
 	}
 
-	return tmp 
+	return tmp
 }
 
 var bigCityMap = map[string]bool{
