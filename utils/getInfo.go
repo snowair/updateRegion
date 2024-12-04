@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -237,22 +238,19 @@ func getAreas(areas []map[string]interface{}, cInfo *CityInfo) {
 	}
 }
 func getRegionInfo(province string, city string) (jsonArr []map[string]interface{}, err error) {
-	url := "http://xzqh.mca.gov.cn/selectJson"
-	pData := ""
-	//var myMap map[string] string
-	// var myMap = make(map[string]string)
+	target := "http://xzqh.mca.gov.cn/selectJson"
+	pData := url.Values{}
 	if province != "" {
-		pData = "shengji=" + province
+		pData.Set("shengji", province)
 	}
 	if city != "" {
-		pData += "&diji=" + city
+		pData.Set("diji", city)
 	}
 	var headers = make(map[string]string)
-	headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
 	headers["Origin"] = "http://xzqh.mca.gov.cn"
 	headers["Referer"] = "http://xzqh.mca.gov.cn/map"
-	headers["User-Agent"] = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
-	resp, err := Execute(url, "POST", ([]byte)(pData), headers)
+	headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0"
+	resp, err := Execute(target, "POST", pData, headers)
 	if err != nil {
 		log.Println("Execute err>>", err.Error())
 		return nil, err

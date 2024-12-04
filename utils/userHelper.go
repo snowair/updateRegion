@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -15,16 +17,27 @@ import (
 
 var myClient *http.Client
 
-func Execute(url, method string, pData []byte, headers map[string]string) (result string, err error) {
-	request, err := http.NewRequest(method, url, bytes.NewBuffer(pData))
+func Execute(url, method string, pdata url.Values, headers map[string]string) (result string, err error) {
+	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return "NewRequest err>>", err
 	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	for key, _ := range pdata {
+		_ = writer.WriteField(key, pdata.Get(key))
+	}
+	writer.Close()
+
 	if len(headers) > 0 {
 		for key, value := range headers {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	request.Body = io.NopCloser(body)
+
 	if myClient == nil {
 		myClient = &http.Client{}
 	}
@@ -94,13 +107,13 @@ func writeCsvFile(pInfos []ProvinceInfo) {
 			record = []string{"城市", provinceName, provinceCode, cityName, cityCode}
 			writer.Write(record)
 			//for _, aInfo := range cInfo.AreaInfo {
-				//areaName := aInfo.Name
-				//areaCode := aInfo.Code
+			//areaName := aInfo.Name
+			//areaCode := aInfo.Code
 
-				//record = []string{"区县", provinceName, provinceCode, cityName, cityCode, areaName, areaCode}
-				//if err := writer.Write(record); err != nil {
-					//log.Fatal(err)
-				//}
+			//record = []string{"区县", provinceName, provinceCode, cityName, cityCode, areaName, areaCode}
+			//if err := writer.Write(record); err != nil {
+			//log.Fatal(err)
+			//}
 			//}
 		}
 	}
