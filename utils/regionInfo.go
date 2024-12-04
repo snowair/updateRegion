@@ -37,5 +37,5 @@ type CitySelect struct {
 
 type CitySection struct {
 	C    string     `json:"capital"`
-	List []CityInfo `json:"list"`
+	List []*CityInfo `json:"list"`
 }

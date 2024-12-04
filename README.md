@@ -37,3 +37,35 @@
 - 源码：https://github.com/root6819/usgApiWithGo
 - 官网： [http://www.qipanet.com](http://www.qipanet.com/)
 - 微信 root6819 | QQ 302777528
+
+
+```
+{
+"P": "海南省",
+"N": "省直辖县级行政单位",
+"D": "省直辖县级行政单位",
+"PY": "shengzhixiaxianjixingzhengdanwei",
+"C": "s"
+},
+{
+"P": "河南省",
+"N": "省直辖县级行政单位",
+"D": "省直辖县级行政单位",
+"PY": "shengzhixiaxianjixingzhengdanwei",
+"C": "s"
+},
+{
+"P": "湖北省",
+"N": "省直辖县级行政单位",
+"D": "省直辖县级行政单位",
+"PY": "shengzhixiaxianjixingzhengdanwei",
+"C": "s"
+}
+{
+"P": "新疆维吾尔自治区",
+"N": "自治区直辖县级行政单位",
+"D": "自治区直辖县级行政单位",
+"PY": "zizhiquzhixiaxianjixingzhengdanwei",
+"C": "z"
+}
+```

@@ -95,8 +95,6 @@ func DoGetInfo() {
 			fmt.Println(err.Error())
 			continue
 		}
-		//2. 遍历地级市，获取每个地级市下的区县
-		//地级市编码
 		cityInfos := getCitys(citys, &pInfo)
 		cInfos = append(cInfos, cityInfos...)
 
@@ -105,16 +103,19 @@ func DoGetInfo() {
 
 	//3. 输出json,csv
 	writeJsonFile(makeCityList(cInfos))
+	//writeJsonFile(cInfos)
 
 	log.Println("查询完成，已输出json、csv文件到：", GetExeDir())
 }
 
 func makeCityList(citys []*CityInfo) CitySelect {
-	capitals := map[string][]*CityInfo{}
+	capitals := map[string][]*CityInfo{} // 记录相同首字母的城市
 	capitalsList := [][]*CityInfo{}
+
+	// 遍历所有城市
 	for _, v := range citys {
 		if _, ok := capitals[v.C]; !ok {
-			capitals[v.C] = []*CityInfo{}
+			capitals[v.C] = []*CityInfo{} // 新建
 		}
 
 		capitals[v.C] = append(capitals[v.C], v)
@@ -146,12 +147,12 @@ func makeCityList(citys []*CityInfo) CitySelect {
 		section := CitySection{}
 		for _, v := range c {
 			section.C = v.C
-			section.List = append(section.List, *v)
+			section.List = c
 			if bigCityMap[v.N] {
 				tmp.Hot = append(tmp.Hot, *v)
 			}
-			tmp.List = append(tmp.List, section)
 		}
+		tmp.List = append(tmp.List, section)
 	}
 
 	return tmp
@@ -181,6 +182,28 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 		cInfo.N = cName
 		cInfo.P = pInfo.N
 		cInfo.D = strings.TrimSuffix(cName, "市")
+		cInfo.D = strings.TrimSuffix(cName, "盟")
+		cInfo.D = strings.TrimSuffix(cName, "盟")
+		cInfo.D = strings.TrimSuffix(cName, "藏族羌族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "蒙古自治州")
+		cInfo.D = strings.TrimSuffix(cName, "回族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "彝族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "白族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "傣族景颇族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "藏族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "土家族苗族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "蒙古族藏族自治州☆")
+		cInfo.D = strings.TrimSuffix(cName, "哈尼族彝族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "柯尔克孜自治州")
+		cInfo.D = strings.TrimSuffix(cName, "回族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "苗族侗族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "布依族苗族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "壮族苗族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "傣族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "朝鲜族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "哈萨克自治州☆")
+		cInfo.D = strings.TrimSuffix(cName, "傈僳族自治州")
+		cInfo.D = strings.TrimSuffix(cName, "地区")
 		cInfo.Code = cCode
 
 		spinyin := pinyin.Pinyin(cInfo.D, py)
