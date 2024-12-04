@@ -207,6 +207,24 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 		cInfo.D = strings.TrimSuffix(cInfo.D, "地区")
 		cInfo.Code = cCode
 
+		if cName == "省直辖县级行政单位" {
+			if cInfo.P == "河南省" {
+				cInfo.N = "济源市"
+				cInfo.D = "济源"
+				cInfo.Code = "419001"
+			} else if cInfo.P == "海南省" {
+				getCitys(getHaiNanZhiXiaCity(), pInfo)
+				continue
+
+			} else if cInfo.P == "湖北省" {
+				getCitys(getHuBeiZhiXiaCity(), pInfo)
+				continue
+			}
+		} else if cName == "自治区直辖县级行政单位" && cInfo.P == "新疆维吾尔自治区" {
+			getCitys(getXinjiangZhiXiaCity(), pInfo)
+			continue
+		}
+
 		spinyin := pinyin.Pinyin(cInfo.D, py)
 		for _, v := range spinyin {
 			cInfo.PY += strings.Join(v, "")
@@ -215,11 +233,6 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 			cInfo.C = string([]rune(cInfo.PY)[0])
 		} else {
 			cInfo.C = "z"
-		}
-
-		if cName == "" {
-			// TODO: 新疆直辖县
-
 		}
 
 		// 查询区县行政区
@@ -235,6 +248,29 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 		pInfo.CityInfo = append(pInfo.CityInfo, &cInfo)
 	}
 	return pInfo.CityInfo
+}
+
+func getHaiNanZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"469001","quhao":"0898","shengji":"","diji":"五指山市"},{"children":[],"quHuaDaiMa":"469002","quhao":"0898","shengji":"","diji":"琼海市"},{"children":[],"quHuaDaiMa":"469005","quhao":"0898","shengji":"","diji":"文昌市"},{"children":[],"quHuaDaiMa":"469006","quhao":"0898","shengji":"","diji":"万宁市"},{"children":[],"quHuaDaiMa":"469007","quhao":"0898","shengji":"","diji":"东方市"},{"children":[],"quHuaDaiMa":"469021","quhao":"0898","shengji":"","diji":"定安县"},{"children":[],"quHuaDaiMa":"469022","quhao":"0898","shengji":"","diji":"屯昌县"},{"children":[],"quHuaDaiMa":"469023","quhao":"0898","shengji":"","diji":"澄迈县"},{"children":[],"quHuaDaiMa":"469024","quhao":"0898","shengji":"","diji":"临高县"},{"children":[],"quHuaDaiMa":"469025","quhao":"0898","shengji":"","diji":"白沙黎族自治县"},{"children":[],"quHuaDaiMa":"469026","quhao":"0898","shengji":"","diji":"昌江黎族自治县"},{"children":[],"quHuaDaiMa":"469027","quhao":"0898","shengji":"","diji":"乐东黎族自治县"},{"children":[],"quHuaDaiMa":"469028","quhao":"0898","shengji":"","diji":"陵水黎族自治县"},{"children":[],"quHuaDaiMa":"469029","quhao":"0898","shengji":"","diji":"保亭黎族苗族自治县"},{"children":[],"quHuaDaiMa":"469030","quhao":"0898","shengji":"","diji":"琼中黎族苗族自治县"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
+}
+
+func getHuBeiZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"429004","quhao":"0728","shengji":"","diji":"仙桃市"},{"children":[],"quHuaDaiMa":"429005","quhao":"0728","shengji":"","diji":"潜江市"},{"children":[],"quHuaDaiMa":"429006","quhao":"0728","shengji":"","diji":"天门市"},{"children":[],"quHuaDaiMa":"429021","quhao":"0719","shengji":"","diji":"神农架林区"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
+}
+func getXinjiangZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"659001","quhao":"0993","shengji":"","diji":"石河子市"},{"children":[],"quHuaDaiMa":"659002","quhao":"0997","shengji":"","diji":"阿拉尔市"},{"children":[],"quHuaDaiMa":"659003","quhao":"0998","shengji":"","diji":"图木舒克市"},{"children":[],"quHuaDaiMa":"659004","quhao":"0994","shengji":"","diji":"五家渠市"},{"children":[],"quHuaDaiMa":"659005","quhao":"0906","shengji":"","diji":"北屯市"},{"children":[],"quHuaDaiMa":"659006","quhao":"0906","shengji":"","diji":"铁门关市"},{"children":[],"quHuaDaiMa":"659007","quhao":"0909","shengji":"","diji":"双河市"},{"children":[],"quHuaDaiMa":"659008","quhao":"0999","shengji":"","diji":"可克达拉市"},{"children":[],"quHuaDaiMa":"659009","quhao":"0903","shengji":"","diji":"昆玉市"},{"children":[],"quHuaDaiMa":"659010","quhao":"0992","shengji":"","diji":"胡杨河市"},{"children":[],"quHuaDaiMa":"659011","quhao":"0902","shengji":"","diji":"新星市"},{"children":[],"quHuaDaiMa":"659012","quhao":"0901","shengji":"","diji":"白杨市"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
 }
 
 // 获取某个城市下所有的区县
