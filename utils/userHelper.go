@@ -1,42 +1,33 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
 var myClient *http.Client
 
 func Execute(url, method string, pdata url.Values, headers map[string]string) (result string, err error) {
-	request, err := http.NewRequest(method, url, nil)
+	request, err := http.NewRequest(method, url, strings.NewReader(pdata.Encode()))
 	if err != nil {
 		return "NewRequest err>>", err
 	}
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	for key, _ := range pdata {
-		_ = writer.WriteField(key, pdata.Get(key))
-	}
-	writer.Close()
 
 	if len(headers) > 0 {
 		for key, value := range headers {
 			request.Header.Set(key, value)
 		}
 	}
-	request.Header.Set("Content-Type", writer.FormDataContentType())
-	request.Body = io.NopCloser(body)
 
 	if myClient == nil {
 		myClient = &http.Client{}

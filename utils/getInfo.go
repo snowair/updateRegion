@@ -247,6 +247,7 @@ func getRegionInfo(province string, city string) (jsonArr []map[string]interface
 		pData.Set("diji", city)
 	}
 	var headers = make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
 	headers["Origin"] = "http://xzqh.mca.gov.cn"
 	headers["Referer"] = "http://xzqh.mca.gov.cn/map"
 	headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0"
