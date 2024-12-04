@@ -86,13 +86,13 @@ func writeCsvFile(pInfos []ProvinceInfo) {
 
 	// Write data to the CSV file
 	for _, pInfo := range pInfos {
-		provinceName := pInfo.Name
+		provinceName := pInfo.N
 		provinceCode := pInfo.Code
 		//province
 		record := []string{"省份", provinceName, provinceCode}
 		writer.Write(record)
 		for _, cInfo := range pInfo.CityInfo {
-			cityName := cInfo.Name
+			cityName := cInfo.N
 			cityCode := cInfo.Code
 
 			record = []string{"城市", provinceName, provinceCode, cityName, cityCode}

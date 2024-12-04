@@ -1,20 +1,20 @@
 package utils
 
 type ProvinceInfo struct {
-	Name     string // 官方名称
-	Display  string // 外显名称
+	N        string // 官方名称
+	D        string // 外显名称
 	Code     string `json:"-"`
-	Pinyin   string // 拼音
-	Capital  string // 首字母
+	PY       string // 拼音
+	C        string // 首字母
 	CityInfo []*CityInfo
 }
 type CityInfo struct {
-	ProvinceName string
-	Name     string
-	Display  string // 外显名称
-	Pinyin   string // 拼音
-	Capital  string // 首字母
-	Code     string `json:"-"`
+	P    string
+	N    string
+	D    string // 外显名称
+	PY   string // 拼音
+	C    string // 首字母
+	Code string `json:"-"`
 	//AreaInfo []AreaInfo
 }
 type AreaInfo struct {
@@ -36,6 +36,6 @@ type CitySelect struct {
 }
 
 type CitySection struct {
-	Capital string     `json:"capital"`
-	List    []CityInfo `json:"list"`
+	C    string     `json:"capital"`
+	List []CityInfo `json:"list"`
 }

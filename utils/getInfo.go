@@ -20,7 +20,6 @@ func init() {
 
 func DoGetInfo() {
 
-	var pInfos = []ProvinceInfo{}
 	var cInfos = []*CityInfo{}
 	provinces := []string{
 		"北京市（京）:110000",
@@ -76,18 +75,18 @@ func DoGetInfo() {
 		simple = strings.TrimSuffix(simple, "回族")
 		simple = strings.TrimSuffix(simple, "壮族")
 
-		pInfo.Name = p
-		pInfo.Display = simple
+		pInfo.N = p
+		pInfo.D = simple
 		pInfo.Code = provinceInfo[1]
 
-		spinyin := pinyin.Pinyin(pInfo.Display, py)
+		spinyin := pinyin.Pinyin(pInfo.D, py)
 		for _, v := range spinyin {
-			pInfo.Pinyin += strings.Join(v, "")
+			pInfo.PY += strings.Join(v, "")
 		}
-		if len(pInfo.Pinyin) > 0 {
-			pInfo.Capital = string([]rune(pInfo.Pinyin)[0])
+		if len(pInfo.PY) > 0 {
+			pInfo.C = string([]rune(pInfo.PY)[0])
 		} else {
-			pInfo.Capital = "z"
+			pInfo.C = "z"
 		}
 
 		fmt.Printf("进度: %d/%d 正在查询省份%s...\r\n", (index + 1), len(provinces), province)
@@ -98,29 +97,15 @@ func DoGetInfo() {
 		}
 		//2. 遍历地级市，获取每个地级市下的区县
 		//地级市编码
-		cityInfos := getCitys(citys, provinceInfo[0], &pInfo)
-		pInfos = append(pInfos, pInfo)
-		if len(cityInfos) == 0 {
-
-			cInfos = append(cInfos, &CityInfo{
-				ProvinceName: pInfo.Name,
-				Name:         pInfo.Name,
-				Display:      pInfo.Display,
-				Pinyin:       pInfo.Pinyin,
-				Capital:      pInfo.Capital,
-			})
-		} else {
-			cInfos = append(cInfos, cityInfos...)
-		}
+		cityInfos := getCitys(citys, &pInfo)
+		cInfos = append(cInfos, cityInfos...)
 
 		time.Sleep(time.Second * 1)
 	}
 
 	//3. 输出json,csv
-	//writeJsonFile(pInfos)
 	writeJsonFile(makeCityList(cInfos))
 
-	//writeCsvFile(pInfos)
 	log.Println("查询完成，已输出json、csv文件到：", GetExeDir())
 }
 
@@ -128,16 +113,16 @@ func makeCityList(citys []*CityInfo) CitySelect {
 	capitals := map[string][]*CityInfo{}
 	capitalsList := [][]*CityInfo{}
 	for _, v := range citys {
-		if _, ok := capitals[v.Capital]; !ok {
-			capitals[v.Capital] = []*CityInfo{}
+		if _, ok := capitals[v.C]; !ok {
+			capitals[v.C] = []*CityInfo{}
 		}
 
-		capitals[v.Capital] = append(capitals[v.Capital], v)
+		capitals[v.C] = append(capitals[v.C], v)
 	}
 
 	for _, v := range capitals {
 		sort.Slice(v, func(i, j int) bool {
-			if v[i].Pinyin < v[j].Pinyin {
+			if v[i].PY < v[j].PY {
 				return true
 			}
 			return false
@@ -146,7 +131,7 @@ func makeCityList(citys []*CityInfo) CitySelect {
 	}
 
 	sort.Slice(capitalsList, func(i, j int) bool {
-		if capitalsList[i][0].Capital < capitalsList[j][0].Capital {
+		if capitalsList[i][0].C < capitalsList[j][0].C {
 			return true
 		}
 		return false
@@ -160,9 +145,9 @@ func makeCityList(citys []*CityInfo) CitySelect {
 	for _, c := range capitalsList {
 		section := CitySection{}
 		for _, v := range c {
-			section.Capital = v.Capital
+			section.C = v.C
 			section.List = append(section.List, *v)
-			if bigCityMap[v.Name] {
+			if bigCityMap[v.N] {
 				tmp.Hot = append(tmp.Hot, *v)
 			}
 			tmp.List = append(tmp.List, section)
@@ -186,26 +171,31 @@ var bigCityMap = map[string]bool{
 }
 
 // 获取某个省份下所有城市
-func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceInfo) []*CityInfo {
+func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 	for _, city := range citys {
 		cName := city["diji"].(string)
 
 		cCode := city["quHuaDaiMa"].(string)
 
 		var cInfo = CityInfo{}
-		cInfo.Name = cName
-		cInfo.ProvinceName = pInfo.Name
-		cInfo.Display = strings.TrimSuffix(cName, "市")
+		cInfo.N = cName
+		cInfo.P = pInfo.N
+		cInfo.D = strings.TrimSuffix(cName, "市")
 		cInfo.Code = cCode
 
-		spinyin := pinyin.Pinyin(cInfo.Display, py)
+		spinyin := pinyin.Pinyin(cInfo.D, py)
 		for _, v := range spinyin {
-			cInfo.Pinyin += strings.Join(v, "")
+			cInfo.PY += strings.Join(v, "")
 		}
-		if len(cInfo.Pinyin) > 0 {
-			cInfo.Capital = string([]rune(cInfo.Pinyin)[0])
+		if len(cInfo.PY) > 0 {
+			cInfo.C = string([]rune(cInfo.PY)[0])
 		} else {
-			cInfo.Capital = "z"
+			cInfo.C = "z"
+		}
+
+		if cName == "" {
+			// TODO: 新疆直辖县
+
 		}
 
 		// 查询区县行政区
