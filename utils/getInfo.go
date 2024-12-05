@@ -182,32 +182,28 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 		cInfo.P = pInfo.N
 		cInfo.N = cName
 		cInfo.D = cName
-		if cName != "海南藏族自治州" {
-			cInfo.D = strings.TrimSuffix(cInfo.D, "市")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "盟")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "藏族羌族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "傣族景颇族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "土家族苗族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古族藏族自治州☆")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "哈尼族彝族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "柯尔克孜自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "苗族侗族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "布依族苗族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "壮族苗族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "彝族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "白族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "藏族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "傣族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "朝鲜族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "哈萨克自治州☆")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "傈僳族自治州")
-			cInfo.D = strings.TrimSuffix(cInfo.D, "地区")
-		} else {
-			cInfo.D = "海南州"
-		}
+		cInfo.D = strings.TrimSuffix(cInfo.D, "市")
+		cInfo.D = strings.TrimSuffix(cInfo.D, "盟")
+		cInfo.D = strings.TrimSuffix(cInfo.D, "藏族羌族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "傣族景颇族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "土家族苗族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古族藏族自治州☆") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "哈尼族彝族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "柯尔克孜自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "苗族侗族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "布依族苗族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "壮族苗族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "彝族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "白族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "藏族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "傣族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "朝鲜族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "哈萨克自治州☆") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "傈僳族自治州") + "州"
+		cInfo.D = strings.TrimSuffix(cInfo.D, "地区")
 		cInfo.Code = cCode
 
 		if cName == "省直辖县级行政单位" {
