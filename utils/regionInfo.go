@@ -10,7 +10,7 @@ type CityInfo struct {
 	Name     string
 	Display  string  // 外显名称
 	Code     string `json:"-"`
-	AreaInfo []AreaInfo
+	//AreaInfo []AreaInfo
 }
 type AreaInfo struct {
 	Name string

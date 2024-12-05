@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -71,18 +72,19 @@ func DoGetInfo() {
 		fmt.Printf("进度: %d/%d 正在查询省份%s...\r\n", (index + 1), len(provinces), province)
 		citys, err := getRegionInfo(provinceInfo[0], "")
 		if err != nil {
+			fmt.Println(err.Error())
 			continue
 		}
 		//2. 遍历地级市，获取每个地级市下的区县
 		//地级市编码
-		getCitys(citys, provinceInfo[0], &pInfo)
+		getCitys(citys, &pInfo)
 		pInfos = append(pInfos, pInfo)
 		time.Sleep(time.Second * 1)
 	}
 
 	//3. 输出json,csv
 	writeJsonFile(pInfos)
-	writeCsvFile(pInfos)
+	//writeCsvFile(pInfos)
 	log.Println("查询完成，已输出json、csv文件到：", GetExeDir())
 }
 
@@ -96,7 +98,7 @@ var bigCityMap = map[string]bool{
 }
 
 // 获取某个省份下所有城市
-func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceInfo) {
+func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) {
 	for _, city := range citys {
 		cName := city["diji"].(string)
 
@@ -104,15 +106,58 @@ func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceIn
 
 		var cInfo = CityInfo{}
 		cInfo.Name = cName
-		cInfo.Display = strings.TrimSuffix(cName, "市")
+		cInfo.Display = cName
+		cInfo.Display = strings.TrimSuffix(cInfo.Display, "市")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "藏族羌族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傣族景颇族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "土家族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古族藏族自治州☆", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古族藏族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈尼族彝族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "柯尔克孜自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "苗族侗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "布依族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "壮族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "回族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "彝族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "白族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "藏族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "回族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傣族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "朝鲜族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈萨克自治州☆", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈萨克自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傈僳族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "黎族苗族自治县", "县")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "黎族自治县", "县")
+
 		cInfo.Code = cCode
 
-		areas, err := getRegionInfo(province, cName)
-		if err != nil {
+		if cName == "省直辖县级行政单位" {
+			if pInfo.Name == "河南省" {
+				cInfo.Name = "济源市"
+				cInfo.Display = "济源"
+				cInfo.Code = "419001"
+			} else if pInfo.Name == "海南省" {
+				getCitys(getHaiNanZhiXiaCity(), pInfo)
+				continue
+
+			} else if pInfo.Name == "湖北省" {
+				getCitys(getHuBeiZhiXiaCity(), pInfo)
+				continue
+			}
+		} else if cName == "自治区直辖县级行政单位" && pInfo.Name == "新疆维吾尔自治区" {
+			getCitys(getXinjiangZhiXiaCity(), pInfo)
 			continue
 		}
 
-		getAreas(areas, &cInfo)
+		//areas, err := getRegionInfo(province, cName)
+		//if err != nil {
+		//continue
+		//}
+
+		//getAreas(areas, &cInfo)
 		pInfo.CityInfo = append(pInfo.CityInfo, cInfo)
 	}
 }
@@ -120,38 +165,67 @@ func getCitys(citys []map[string]interface{}, province string, pInfo *ProvinceIn
 // 获取某个城市下所有的区县
 func getAreas(areas []map[string]interface{}, cInfo *CityInfo) {
 	for _, area := range areas {
-		aName := area["xianji"].(string)
+		aName := area["eianji"].(string)
 		aCode := area["quHuaDaiMa"].(string)
 
 		var aInfo = AreaInfo{}
 		aInfo.Name = aName
 		aInfo.Display = aName
 		aInfo.Code = aCode
-		cInfo.AreaInfo = append(cInfo.AreaInfo, aInfo)
+		//cInfo.AreaInfo = append(cInfo.AreaInfo, aInfo)
 
 	}
 }
+
 func getRegionInfo(province string, city string) (jsonArr []map[string]interface{}, err error) {
-	url := "http://xzqh.mca.gov.cn/selectJson"
-	pData := ""
-	//var myMap map[string] string
-	// var myMap = make(map[string]string)
+	target := "http://xzqh.mca.gov.cn/selectJson"
+	pData := url.Values{}
 	if province != "" {
-		pData = "shengji=" + province
+		pData.Set("shengji", province)
 	}
 	if city != "" {
-		pData += "&diji=" + city
+		pData.Set("diji", city)
 	}
 	var headers = make(map[string]string)
-	headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
-	resp, err := Execute(url, "POST", ([]byte)(pData), headers)
+	headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
+	headers["Origin"] = "http://xzqh.mca.gov.cn"
+	headers["Referer"] = "http://xzqh.mca.gov.cn/map"
+	headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0"
+	resp, err := Execute(target, "POST", pData, headers)
 	if err != nil {
 		log.Println("Execute err>>", err.Error())
 		return nil, err
 	}
 
-	json.Unmarshal(resp.([]byte), &jsonArr)
+	err = json.Unmarshal([]byte(resp), &jsonArr)
+	if err != nil {
+		fmt.Println(resp)
+		return jsonArr, err
+	}
 
 	//log.Println(jsonArr)
 	return jsonArr, nil
+}
+
+func getHaiNanZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"469001","quhao":"0898","shengji":"","diji":"五指山市"},{"children":[],"quHuaDaiMa":"469002","quhao":"0898","shengji":"","diji":"琼海市"},{"children":[],"quHuaDaiMa":"469005","quhao":"0898","shengji":"","diji":"文昌市"},{"children":[],"quHuaDaiMa":"469006","quhao":"0898","shengji":"","diji":"万宁市"},{"children":[],"quHuaDaiMa":"469007","quhao":"0898","shengji":"","diji":"东方市"},{"children":[],"quHuaDaiMa":"469021","quhao":"0898","shengji":"","diji":"定安县"},{"children":[],"quHuaDaiMa":"469022","quhao":"0898","shengji":"","diji":"屯昌县"},{"children":[],"quHuaDaiMa":"469023","quhao":"0898","shengji":"","diji":"澄迈县"},{"children":[],"quHuaDaiMa":"469024","quhao":"0898","shengji":"","diji":"临高县"},{"children":[],"quHuaDaiMa":"469025","quhao":"0898","shengji":"","diji":"白沙黎族自治县"},{"children":[],"quHuaDaiMa":"469026","quhao":"0898","shengji":"","diji":"昌江黎族自治县"},{"children":[],"quHuaDaiMa":"469027","quhao":"0898","shengji":"","diji":"乐东黎族自治县"},{"children":[],"quHuaDaiMa":"469028","quhao":"0898","shengji":"","diji":"陵水黎族自治县"},{"children":[],"quHuaDaiMa":"469029","quhao":"0898","shengji":"","diji":"保亭黎族苗族自治县"},{"children":[],"quHuaDaiMa":"469030","quhao":"0898","shengji":"","diji":"琼中黎族苗族自治县"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
+}
+
+func getHuBeiZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"429004","quhao":"0728","shengji":"","diji":"仙桃市"},{"children":[],"quHuaDaiMa":"429005","quhao":"0728","shengji":"","diji":"潜江市"},{"children":[],"quHuaDaiMa":"429006","quhao":"0728","shengji":"","diji":"天门市"},{"children":[],"quHuaDaiMa":"429021","quhao":"0719","shengji":"","diji":"神农架林区"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
+}
+func getXinjiangZhiXiaCity() []map[string]interface{} {
+	s := `[{"children":[],"quHuaDaiMa":"659001","quhao":"0993","shengji":"","diji":"石河子市"},{"children":[],"quHuaDaiMa":"659002","quhao":"0997","shengji":"","diji":"阿拉尔市"},{"children":[],"quHuaDaiMa":"659003","quhao":"0998","shengji":"","diji":"图木舒克市"},{"children":[],"quHuaDaiMa":"659004","quhao":"0994","shengji":"","diji":"五家渠市"},{"children":[],"quHuaDaiMa":"659005","quhao":"0906","shengji":"","diji":"北屯市"},{"children":[],"quHuaDaiMa":"659006","quhao":"0906","shengji":"","diji":"铁门关市"},{"children":[],"quHuaDaiMa":"659007","quhao":"0909","shengji":"","diji":"双河市"},{"children":[],"quHuaDaiMa":"659008","quhao":"0999","shengji":"","diji":"可克达拉市"},{"children":[],"quHuaDaiMa":"659009","quhao":"0903","shengji":"","diji":"昆玉市"},{"children":[],"quHuaDaiMa":"659010","quhao":"0992","shengji":"","diji":"胡杨河市"},{"children":[],"quHuaDaiMa":"659011","quhao":"0902","shengji":"","diji":"新星市"},{"children":[],"quHuaDaiMa":"659012","quhao":"0901","shengji":"","diji":"白杨市"}]`
+	jsonArr := []map[string]interface{}{}
+	json.Unmarshal([]byte(s), &jsonArr)
+	return jsonArr
+
 }

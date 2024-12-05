@@ -1,29 +1,34 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
 var myClient *http.Client
 
-func Execute(url, method string, pData []byte, headers map[string]string) (result interface{}, err error) {
-	request, err := http.NewRequest(method, url, bytes.NewBuffer(pData))
+func Execute(url, method string, pdata url.Values, headers map[string]string) (result string, err error) {
+	request, err := http.NewRequest(method, url, strings.NewReader(pdata.Encode()))
 	if err != nil {
 		return "NewRequest err>>", err
 	}
+
+
 	if len(headers) > 0 {
 		for key, value := range headers {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
+
 	if myClient == nil {
 		myClient = &http.Client{}
 	}
@@ -34,12 +39,11 @@ func Execute(url, method string, pData []byte, headers map[string]string) (resul
 	defer response.Body.Close()
 
 	fmt.Println("response code>>", response.StatusCode)
-	buff := &bytes.Buffer{}
-	_, err = buff.ReadFrom(response.Body)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return "readData err>>", err
+		return "", err
 	}
-	return buff.Bytes(), nil
+	return string(data), nil
 
 }
 
@@ -50,7 +54,7 @@ func GetExeDir() (path string) {
 }
 
 // 输出文件到根目录 json
-func writeJsonFile(pInfos []ProvinceInfo) {
+func writeJsonFile(pInfos interface{}) {
 
 	//写json
 	buff, _ := json.Marshal(pInfos)
@@ -93,17 +97,18 @@ func writeCsvFile(pInfos []ProvinceInfo) {
 
 			record = []string{"城市", provinceName, provinceCode, cityName, cityCode}
 			writer.Write(record)
-			for _, aInfo := range cInfo.AreaInfo {
-				areaName := aInfo.Name
-				areaCode := aInfo.Code
+			//for _, aInfo := range cInfo.AreaInfo {
+			//areaName := aInfo.Name
+			//areaCode := aInfo.Code
 
-				record = []string{"区县", provinceName, provinceCode, cityName, cityCode, areaName, areaCode}
-				if err := writer.Write(record); err != nil {
-					log.Fatal(err)
-				}
-			}
+			//record = []string{"区县", provinceName, provinceCode, cityName, cityCode, areaName, areaCode}
+			//if err := writer.Write(record); err != nil {
+			//log.Fatal(err)
+			//}
+			//}
 		}
 	}
 
 	log.Printf("CSV file saved to: %s\n", fPath)
 }
+
