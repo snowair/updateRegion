@@ -75,11 +75,11 @@ func DoGetInfo() {
 		simple = strings.TrimSuffix(simple, "回族")
 		simple = strings.TrimSuffix(simple, "壮族")
 
-		pInfo.N = p
-		pInfo.D = simple
+		pInfo.Name = p
+		pInfo.Display = simple
 		pInfo.Code = provinceInfo[1]
 
-		spinyin := pinyin.Pinyin(pInfo.D, py)
+		spinyin := pinyin.Pinyin(pInfo.Display, py)
 		for _, v := range spinyin {
 			pInfo.PY += strings.Join(v, "")
 		}
@@ -148,7 +148,7 @@ func makeCityList(citys []*CityInfo) CitySelect {
 		for _, v := range c {
 			section.C = v.C
 			section.List = c
-			if bigCityMap[v.N] {
+			if bigCityMap[v.Name] {
 				tmp.Hot = append(tmp.Hot, *v)
 			}
 		}
@@ -179,52 +179,52 @@ func getCitys(citys []map[string]interface{}, pInfo *ProvinceInfo) []*CityInfo {
 		cCode := city["quHuaDaiMa"].(string)
 
 		var cInfo = CityInfo{}
-		cInfo.P = pInfo.N
-		cInfo.N = cName
-		cInfo.D = cName
-		cInfo.D = strings.TrimSuffix(cInfo.D, "市")
-		cInfo.D = strings.TrimSuffix(cInfo.D, "盟")
-		cInfo.D = strings.TrimSuffix(cInfo.D, "藏族羌族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "傣族景颇族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "土家族苗族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古族藏族自治州☆") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "哈尼族彝族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "柯尔克孜自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "苗族侗族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "布依族苗族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "壮族苗族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "蒙古自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "彝族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "白族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "藏族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "回族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "傣族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "朝鲜族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "哈萨克自治州☆") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "傈僳族自治州") + "州"
-		cInfo.D = strings.TrimSuffix(cInfo.D, "地区")
+		cInfo.Province = pInfo.Name
+		cInfo.Name = cName
+		cInfo.Display = cName
+		cInfo.Display = strings.TrimSuffix(cInfo.Display, "市")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "藏族羌族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傣族景颇族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "土家族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古族藏族自治州☆", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古族藏族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈尼族彝族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "柯尔克孜自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "苗族侗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "布依族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "壮族苗族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "蒙古自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "回族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "彝族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "白族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "藏族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "回族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傣族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "朝鲜族自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈萨克自治州☆", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "哈萨克自治州", "州")
+		cInfo.Display = strings.ReplaceAll(cInfo.Display, "傈僳族自治州", "州")
 		cInfo.Code = cCode
 
 		if cName == "省直辖县级行政单位" {
-			if cInfo.P == "河南省" {
-				cInfo.N = "济源市"
-				cInfo.D = "济源"
+			if cInfo.Province == "河南省" {
+				cInfo.Name = "济源市"
+				cInfo.Display = "济源"
 				cInfo.Code = "419001"
-			} else if cInfo.P == "海南省" {
+			} else if cInfo.Province == "海南省" {
 				getCitys(getHaiNanZhiXiaCity(), pInfo)
 				continue
 
-			} else if cInfo.P == "湖北省" {
+			} else if cInfo.Province == "湖北省" {
 				getCitys(getHuBeiZhiXiaCity(), pInfo)
 				continue
 			}
-		} else if cName == "自治区直辖县级行政单位" && cInfo.P == "新疆维吾尔自治区" {
+		} else if cName == "自治区直辖县级行政单位" && cInfo.Province == "新疆维吾尔自治区" {
 			getCitys(getXinjiangZhiXiaCity(), pInfo)
 			continue
 		}
 
-		spinyin := pinyin.Pinyin(cInfo.D, py)
+		spinyin := pinyin.Pinyin(cInfo.Display, py)
 		for _, v := range spinyin {
 			cInfo.PY += strings.Join(v, "")
 		}
